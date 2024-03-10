@@ -26,19 +26,23 @@ usage: pint -h | --help
           [ --json | --xml ]
        pint ({PROVIDERS}) server_types 
           [ --json | --xml ]
+          [ --api-server=<url> ]
        pint ({PROVIDERS}) regions
           [ --filter=<filter> ]
           [ --json | --xml ]
+          [ --api-server=<url> ]
        pint ({PROVIDERS}) servers
           [ --filter=<filter> ]
           [ --json | --xml ]
           [ --region=<region> ]
           [ --smt | --regionserver ]
+          [ --api-server=<url> ]
        pint ({PROVIDERS}) images
           [ --active | --inactive | --deleted | --deprecated ]
           [ --filter=<filter> | --published-after=<date> ]
           [ --json | --xml ]
           [ --region=<region> ]
+          [ --api-server=<url> ]
        pint -v | --version
        pint filters
 
@@ -72,6 +76,8 @@ options:
        Output data in XML format
    -v --version
        Show program version
+   --api-server=<url>
+       Allows querying from other api servers
 
 For Additional help run `man pint` to view the man page       
 """
@@ -84,9 +90,11 @@ from docopt import docopt
 import susepubliccloudinfoclient.infoserverrequests as ifsrequest
 import susepubliccloudinfoclient.version as version
 
+api = 'https://susepubliccloudinfo.suse.com'
+
 try:
     provider_data = ifsrequest.get_provider_data(
-        None, None, 'json', 'all', None
+        api, None, None, 'json', 'all', None
     )
 except Exception:
     print('Unable to contact pint server')
@@ -116,8 +124,9 @@ for csp in cloud_providers:
 
 image_state = None
 image_states_data = ifsrequest.get_image_states_data(
-    None, None, 'json', None
+    api, None, None, 'json', None
 )
+
 try:
     image_state_info = json.loads(image_states_data)
 except json.decoder.JSONDecodeError:
@@ -127,6 +136,9 @@ except json.decoder.JSONDecodeError:
 image_states = []
 for possible_image_state in image_state_info.get('states'):
     image_states.append(possible_image_state.get('name'))
+
+if command_args['--api-server']:
+    api = command_args['--api-server']
 
 for state in image_states:
     if command_args['--%s' % state]:
@@ -152,54 +164,67 @@ if command_args['--region']:
     region = command_args['--region']
 
 try:
+    if command_args['--published-after']:
+        command_args['--filter']=f'publishedon>{command_args["--published-after"]}'
     if command_args['images']:
         data = ifsrequest.get_image_data(
+            api,
             framework,
             image_state,
             output_format,
             region,
-            command_args['--filter'],
-            command_args['--published-after'])
+            command_args['--filter']
+            )
         if '<images/>' in data or '"images": []' in data:
             data = 'No information available. Please check your filter'
         print(data)
     elif command_args['servers']:
         print(ifsrequest.get_server_data(
-            framework,
-            server_type,
-            output_format,
-            region,
-            command_args['--filter']))
-    elif command_args['providers']:
-        print(ifsrequest.get_provider_data(
-            framework,
-            server_type,
-            output_format,
-            region,
-            command_args['--filter']))
-    elif command_args['image_states']:
-        print(ifsrequest.get_image_states_data(
-            framework,
-            server_type,
-            output_format,
-            region,
-            command_args['--filter']))
-    elif command_args['server_types']:
-        print(ifsrequest.get_server_types_data(
-            framework,
-            server_type,
-            output_format,
-            region,
-            command_args['--filter']))
-    elif command_args['filters']:
-        print(ifsrequest.get_filters_help())
-    else:
-        regions = ifsrequest.get_regions_data(
+            api,
             framework,
             server_type,
             output_format,
             region,
             command_args['--filter'])
+            )
+    elif command_args['providers']:
+        print(ifsrequest.get_provider_data(
+            api,
+            framework,
+            server_type,
+            output_format,
+            region,
+            command_args['--filter'])
+            )
+    elif command_args['image_states']:
+        print(ifsrequest.get_image_states_data(
+            api,
+            framework,
+            server_type,
+            output_format,
+            region,
+            command_args['--filter'])
+            )
+    elif command_args['server_types']:
+        print(ifsrequest.get_server_types_data(
+            api,
+            framework,
+            server_type,
+            output_format,
+            region,
+            command_args['--filter'])
+            )
+    elif command_args['filters']:
+        print(ifsrequest.get_filters_help())
+    else:
+        regions = ifsrequest.get_regions_data(
+            api,
+            framework,
+            server_type,
+            output_format,
+            region,
+            command_args['--filter']
+            )
         if '<regions/>' in regions or '"regions": []' in regions:
             regions = ('No region information available. Images have '
                        'the same identifier in all regions')

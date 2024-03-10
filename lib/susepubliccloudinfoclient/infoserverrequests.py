@@ -140,16 +140,16 @@ def __filter_greater_than(items, attr, value):
 
 
 def __form_url(
+        api,
         framework,
         info_type,
-        result_format='xml',
         region='all',
         image_state=None,
         server_type=None,
-        apply_filters=None):
+        ):
     """Form the URL for the request"""
     url_components = []
-    url_components.append(__get_base_url())
+    url_components.append(api)
     url_components.append(__get_api_version())
     if framework:
         url_components.append(framework)
@@ -174,12 +174,6 @@ def __form_url(
 def __get_api_version():
     """Return the API version to use"""
     return 'v1'
-
-
-def __get_base_url():
-    """Return the base url for the information service"""
-    return 'https://susepubliccloudinfo.suse.com'
-    # return 'http://localhost:9292'
 
 
 def __get_data(url):
@@ -304,14 +298,17 @@ def __process(url, info_type, command_arg_filter, result_format):
 
 
 def get_provider_data(
+        api,
         framework,
         type,
         result_format='plain',
         region='all',
-        command_arg_filter=None):
+        command_arg_filter=None
+        ):
     """Return the requested providers information"""
     info_type = 'providers'
     url = __form_url(
+        api,
         framework,
         info_type,
         result_format,
@@ -323,14 +320,17 @@ def get_provider_data(
 
 
 def get_image_states_data(
+        api,
         framework,
         type,
         result_format='plain',
         region='all',
-        command_arg_filter=None):
+        command_arg_filter=None
+        ):
     """Return the requested image states information"""
     info_type = 'states'
     url = __form_url(
+        api,
         framework,
         info_type,
         result_format,
@@ -342,14 +342,17 @@ def get_image_states_data(
 
 
 def get_server_types_data(
+        api,
         framework,
         type,
         result_format='plain',
         region='all',
-        command_arg_filter=None):
+        command_arg_filter=None
+        ):
     """Return the requested server types information"""
     info_type = 'types'
     url = __form_url(
+        api,
         framework,
         info_type,
         result_format,
@@ -361,14 +364,17 @@ def get_server_types_data(
 
 
 def get_regions_data(
+        api,
         framework,
         type,
         result_format='plain',
         region='all',
-        command_arg_filter=None):
+        command_arg_filter=None
+        ):
     """Return the requested regions information"""
     info_type = 'regions'
     url = __form_url(
+        api,
         framework,
         info_type,
         result_format,
@@ -380,17 +386,20 @@ def get_regions_data(
 
 
 def get_image_data(
+        api,
         framework,
         image_state,
         result_format='plain',
         region='all',
         command_arg_filter=None,
-        command_arg_date=None):
+        command_arg_date=None
+        ):
     """Return the requested image information"""
     info_type = 'images'
     if command_arg_date:
         command_arg_filter=f'publishedon>{command_arg_date}'
     url = __form_url(
+        api,
         framework,
         info_type,
         result_format,
@@ -402,14 +411,17 @@ def get_image_data(
 
 
 def get_server_data(
+        api,
         framework,
         server_type,
         result_format='plain',
         region='all',
-        command_arg_filter=None):
+        command_arg_filter=None
+        ):
     """Return the requested server information"""
     info_type = 'servers'
     url = __form_url(
+        api,
         framework,
         info_type,
         result_format,
@@ -418,6 +430,7 @@ def get_server_data(
         apply_filters=command_arg_filter
     )
     return __process(url, info_type, command_arg_filter, result_format)
+
 
 def get_filters_help():
     return '''
