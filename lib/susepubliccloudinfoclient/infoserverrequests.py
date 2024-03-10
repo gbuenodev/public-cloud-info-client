@@ -415,3 +415,36 @@ def get_server_data(
         apply_filters=command_arg_filter
     )
     return __process(url, info_type, command_arg_filter, result_format)
+
+def get_filters_help():
+    return '''
+Here is how you can use the "--filter" option:
+
+--filter   
+    Filter  the  information based on the given value(s). If the information is to be filtered on more than one entry type provide a comma separated list. The output is a subset of results that match all the filters. The filter option specifies one or more of the valid data entries for the chosen <data-selector> and is a valid option for the images and servers arguments. Name filters ( name, replacementname ) can be partial string matches (~), partial string exclusions (!), or regular expression matches (%). Date filters ( deletedon, deprecatedon, publishedon ) can be less than, equal or greater than a specified date, in the format yyyymmdd.
+    
+Valid filter values for images are:
+
+- deletedon>, deletedon=, deletedon<,
+- deprecatedon>, deprecatedon=, deprecatedon<,
+- id=,
+- name~, name!, name%,
+- publishedon>, publishedon=, publishedon<,
+- replacementid=,
+- replacementname~, replacementname!, replacementname%.
+
+**Note that not all filters will be populated for all images in all frameworks.**
+
+Valid filter values for servers are:
+
+- ip=,
+- name~.  name!.  name%.
+
+**Note that the name for all update servers is the same in each cloud framework. For example smt-azure.susecloud.net in the Microsoft Azure Public Cloud framework. The names are  not  resolv-
+able via DNS lookup. The name for all region servers are the same, regionserver across all cloud frameworks.**
+
+Example:
+
+--filter="publishedon>20150101,name~11-sp3"
+    Filters images to a subset with a name containing "11-sp3" and published after Jan 1, 2015.
+'''

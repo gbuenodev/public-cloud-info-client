@@ -40,6 +40,7 @@ usage: pint -h | --help
           [ --json | --xml ]
           [ --region=<region> ]
        pint -v | --version
+       pint filters
 
 options:
    -h --help
@@ -187,6 +188,8 @@ try:
             output_format,
             region,
             command_args['--filter']))
+    elif command_args['filters']:
+        print(ifsrequest.get_filters_help())
     else:
         regions = ifsrequest.get_regions_data(
             framework,
