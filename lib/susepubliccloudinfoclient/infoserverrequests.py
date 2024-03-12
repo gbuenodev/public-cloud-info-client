@@ -143,13 +143,14 @@ def __form_url(
         api,
         framework,
         info_type,
+        result_format='xml',
         region='all',
         image_state=None,
         server_type=None,
-        ):
+        apply_filters=None):
     """Form the URL for the request"""
     url_components = []
-    url_components.append(api)
+    url_components.append(__get_base_url(api))
     url_components.append(__get_api_version())
     if framework:
         url_components.append(framework)
@@ -174,6 +175,13 @@ def __form_url(
 def __get_api_version():
     """Return the API version to use"""
     return 'v1'
+
+
+def __get_base_url(api):	
+    """Return the base url for the information service"""
+    if api: return api
+    return 'https://susepubliccloudinfo.suse.com'
+    # return 'http://localhost:9292'
 
 
 def __get_data(url):
@@ -303,8 +311,7 @@ def get_provider_data(
         type,
         result_format='plain',
         region='all',
-        command_arg_filter=None
-        ):
+        command_arg_filter=None):
     """Return the requested providers information"""
     info_type = 'providers'
     url = __form_url(
@@ -325,8 +332,7 @@ def get_image_states_data(
         type,
         result_format='plain',
         region='all',
-        command_arg_filter=None
-        ):
+        command_arg_filter=None):
     """Return the requested image states information"""
     info_type = 'states'
     url = __form_url(
@@ -347,8 +353,7 @@ def get_server_types_data(
         type,
         result_format='plain',
         region='all',
-        command_arg_filter=None
-        ):
+        command_arg_filter=None):
     """Return the requested server types information"""
     info_type = 'types'
     url = __form_url(
@@ -369,8 +374,7 @@ def get_regions_data(
         type,
         result_format='plain',
         region='all',
-        command_arg_filter=None
-        ):
+        command_arg_filter=None):
     """Return the requested regions information"""
     info_type = 'regions'
     url = __form_url(
@@ -392,8 +396,7 @@ def get_image_data(
         result_format='plain',
         region='all',
         command_arg_filter=None,
-        command_arg_date=None
-        ):
+        command_arg_date=None):
     """Return the requested image information"""
     info_type = 'images'
     if command_arg_date:
@@ -416,8 +419,7 @@ def get_server_data(
         server_type,
         result_format='plain',
         region='all',
-        command_arg_filter=None
-        ):
+        command_arg_filter=None):
     """Return the requested server information"""
     info_type = 'servers'
     url = __form_url(
